@@ -26,8 +26,26 @@ void add_word(WordCount **hash_table, const char *word) {
   unsigned int index = hash(word);
   WordCount *entry = hash_table[index];
 
-    // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+  // 查找是否已存在该单词
+  while (entry != NULL) {
+    if (strcmp(entry->word, word) == 0) {
+      // 单词已存在,增加计数
+      entry->count++;
+      return;
+    }
+    entry = entry->next;
+  }
+  
+  // 单词不存在,创建新节点并插入链表头部
+  WordCount *new_entry = malloc(sizeof(WordCount));
+  if (!new_entry) {
+    return;
+  }
+  strncpy(new_entry->word, word, MAX_WORD_LEN - 1);
+  new_entry->word[MAX_WORD_LEN - 1] = '\0';
+  new_entry->count = 1;
+  new_entry->next = hash_table[index];
+  hash_table[index] = new_entry;
 }
 
 // 打印单词统计结果
@@ -35,8 +53,35 @@ void print_word_counts(WordCount **hash_table) {
   printf("Word Count Statistics:\n");
   printf("======================\n");
 
-    // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+  // 收集所有单词到一个数组中以便排序
+  WordCount *all_words[HASH_SIZE];
+  int count = 0;
+  
+  for (int i = 0; i < HASH_SIZE; i++) {
+    WordCount *entry = hash_table[i];
+    while (entry != NULL) {
+      all_words[count++] = entry;
+      entry = entry->next;
+    }
+  }
+  
+  // 按出现次数降序排序,次数相同按字母顺序升序
+  for (int i = 0; i < count - 1; i++) {
+    for (int j = i + 1; j < count; j++) {
+      if (all_words[i]->count < all_words[j]->count ||
+          (all_words[i]->count == all_words[j]->count && 
+           strcmp(all_words[i]->word, all_words[j]->word) > 0)) {
+        WordCount *temp = all_words[i];
+        all_words[i] = all_words[j];
+        all_words[j] = temp;
+      }
+    }
+  }
+  
+  // 打印排序后的结果
+  for (int i = 0; i < count; i++) {
+    printf("%-20s %d\n", all_words[i]->word, all_words[i]->count);
+  }
 }
 
 // 释放哈希表内存

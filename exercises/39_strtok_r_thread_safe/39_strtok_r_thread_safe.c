@@ -10,14 +10,62 @@
 
 /* 判断字符 c 是否在分隔符集合 delim 中 */
 static int is_delim(char c, const char *delim) {
-    // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+    while (*delim) {
+        if (c == *delim) {
+            return 1;
+        }
+        delim++;
+    }
+    return 0;
 }
 
 /* 线程安全版本：通过 saveptr 维护调用状态，不使用静态变量 */
 char *strtok_r(char *str, const char *delim, char **saveptr) {
-    // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+    char *start;
+
+    /* 第一次调用: str 非NULL,从 str 开始 */
+    /* 后续调用: str 为NULL,从 saveptr 继续 */
+    if (str != NULL) {
+        start = str;
+    } else {
+        start = *saveptr;
+    }
+
+    /* 如果已经没有字符串可处理了 */
+    if (start == NULL || *start == '\0') {
+        *saveptr = NULL;
+        return NULL;
+    }
+
+    /* 跳过开头的分隔符 */
+    while (*start && is_delim(*start, delim)) {
+        start++;
+    }
+
+    /* 如果跳过分隔符后到达字符串末尾 */
+    if (*start == '\0') {
+        *saveptr = NULL;
+        return NULL;
+    }
+
+    /* 找到token的起始位置 */
+    char *token = start;
+
+    /* 找到token的结束位置(下一个分隔符或字符串末尾) */
+    while (*start && !is_delim(*start, delim)) {
+        start++;
+    }
+
+    /* 如果找到分隔符,将其替换为'\0'并更新saveptr */
+    if (*start) {
+        *start = '\0';
+        *saveptr = start + 1;
+    } else {
+        /* 到达字符串末尾 */
+        *saveptr = NULL;
+    }
+
+    return token;
 }
 
 int main(void) {

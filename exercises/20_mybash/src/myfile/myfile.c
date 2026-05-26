@@ -1,4 +1,8 @@
 #include "myfile.h"
+#include <fcntl.h>
+#include <unistd.h>
+#include <elf.h>
+#include <string.h>
 
 void print_elf_type(uint16_t e_type) {
     const char *type_str;
@@ -38,8 +42,30 @@ int __cmd_myfile(const char* filename) {
     fflush(stdout);
     printf("filepath: %s\n", filepath);
 
-    // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+    // 打开文件
+    fd = open(filepath, O_RDONLY);
+    if (fd < 0) {
+        perror("无法打开文件");
+        return -1;
+    }
+
+    // 读取 ELF 文件头
+    ssize_t bytes_read = read(fd, &ehdr, sizeof(Elf64_Ehdr));
+    if (bytes_read != sizeof(Elf64_Ehdr)) {
+        fprintf(stderr, "读取 ELF 文件头失败\n");
+        close(fd);
+        return -1;
+    }
+
+    // 检查 ELF 魔数
+    if (ehdr.e_ident[EI_MAG0] != ELFMAG0 ||
+        ehdr.e_ident[EI_MAG1] != ELFMAG1 ||
+        ehdr.e_ident[EI_MAG2] != ELFMAG2 ||
+        ehdr.e_ident[EI_MAG3] != ELFMAG3) {
+        fprintf(stderr, "不是有效的 ELF 文件\n");
+        close(fd);
+        return -1;
+    }
 
     print_elf_type(ehdr.e_type);
     close(fd);

@@ -13,8 +13,44 @@ int parse_replace_command(const char* cmd, char** old_str, char** new_str) {
     *old_str = NULL;
     *new_str = NULL;
     
-    // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+    // 解析格式: s/old/new/
+    if (strlen(cmd) < 4 || cmd[0] != 's' || cmd[1] != '/') {
+        return -1;
+    }
+    
+    // 找到第二个 '/' 的位置
+    const char* second_slash = strchr(cmd + 2, '/');
+    if (!second_slash) {
+        return -1;
+    }
+    
+    // 提取 old_str
+    size_t old_len = second_slash - (cmd + 2);
+    *old_str = malloc(old_len + 1);
+    if (!*old_str) {
+        return -1;
+    }
+    strncpy(*old_str, cmd + 2, old_len);
+    (*old_str)[old_len] = '\0';
+    
+    // 找到第三个 '/' 的位置
+    const char* third_slash = strchr(second_slash + 1, '/');
+    if (!third_slash) {
+        free(*old_str);
+        *old_str = NULL;
+        return -1;
+    }
+    
+    // 提取 new_str
+    size_t new_len = third_slash - (second_slash + 1);
+    *new_str = malloc(new_len + 1);
+    if (!*new_str) {
+        free(*old_str);
+        *old_str = NULL;
+        return -1;
+    }
+    strncpy(*new_str, second_slash + 1, new_len);
+    (*new_str)[new_len] = '\0';
 
     return 0;
 }
@@ -25,8 +61,34 @@ void replace_first_occurrence(char* str, const char* old, const char* new) {
         return;
     }
     
-    // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+    // 查找 old 在 str 中的位置
+    char* pos = strstr(str, old);
+    if (!pos) {
+        return;  // 未找到,不替换
+    }
+    
+    size_t old_len = strlen(old);
+    size_t new_len = strlen(new);
+    size_t prefix_len = pos - str;
+    size_t suffix_len = strlen(pos + old_len);
+    
+    // 计算新字符串长度
+    size_t new_str_len = prefix_len + new_len + suffix_len;
+    
+    // 创建临时缓冲区
+    char temp[1024];
+    if (new_str_len >= sizeof(temp)) {
+        return;  // 防止溢出
+    }
+    
+    // 构建新字符串: 前缀 + new + 后缀
+    strncpy(temp, str, prefix_len);
+    temp[prefix_len] = '\0';
+    strcat(temp, new);
+    strcat(temp, pos + old_len);
+    
+    // 复制回原字符串
+    strcpy(str, temp);
 }
 
 int __cmd_mysed(const char* rules, const char* str) {

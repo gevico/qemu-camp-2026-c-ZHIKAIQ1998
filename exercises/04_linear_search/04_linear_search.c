@@ -13,10 +13,15 @@ typedef struct {
 Student students[MAX_STUDENTS];
 int n;
 int linear_search(const char *target_name) {
-    // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+    // 遍历学生数组，逐个比较姓名
+    for (int i = 0; i < n; i++) {
+        // 使用 strcmp 比较字符串，返回 0 表示匹配
+        if (strcmp(students[i].name, target_name) == 0) {
+            return i;   // 找到目标，返回索引
+        }
+    }
+    return -1;          // 遍历结束未找到，返回 -1
 }
-
 int main(void) {
     FILE *file = fopen("04_students.txt", "r");
     if (!file) {

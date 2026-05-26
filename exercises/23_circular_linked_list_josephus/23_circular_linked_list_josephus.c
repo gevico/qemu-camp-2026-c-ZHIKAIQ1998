@@ -23,12 +23,37 @@ static void josephus_problem(int n, int k, int m) {
 
     // 起始位置移动到第 k 个
     for (int i = 1; i < k; ++i) {
-        // TODO: 在这里添加你的代码
-        // I AM NOT DONE
+        prev = current;
+        current = current->next;
     }
 
-    // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+    // 依次淘汰，直到只剩一个节点
+    int remaining = n;
+    while (remaining > 0) {
+        if (remaining == 1) {
+            // 只剩一个节点，直接输出
+            printf("%d", current->id);
+            free(current);
+            break;
+        }
+        
+        // 数 m-1 步，找到要删除的节点的前一个节点
+        for (int step = 1; step < m; step++) {
+            prev = current;
+            current = current->next;
+        }
+        
+        // current 是要删除的节点
+        printf("%d ", current->id);
+        
+        // 从链表中删除 current
+        prev->next = current->next;
+        Node* to_delete = current;
+        current = current->next;
+        free(to_delete);
+        
+        remaining--;
+    }
     
     printf("\n");
 }

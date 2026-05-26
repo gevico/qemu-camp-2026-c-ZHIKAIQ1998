@@ -40,8 +40,67 @@ void processFile(const char *filename) {
     printf("=== 处理数据来自: %s ===\n", filename);
 
     switch (choice) {
-        // TODO: 在这里添加你的代码
-        // I AM NOT DONE
+        case 1: {  // 整数排序
+            int *arr = (int *)malloc(n * sizeof(int));
+            if (!arr) {
+                printf("内存分配失败\n");
+                fclose(fin);
+                return;
+            }
+            
+            for (int i = 0; i < n; i++) {
+                if (fscanf(fin, "%d", &arr[i]) != 1) {
+                    printf("错误: 读取整数失败\n");
+                    free(arr);
+                    fclose(fin);
+                    return;
+                }
+            }
+            
+            sort(arr, n, sizeof(int), compareInt);
+            
+            printf("排序后的整数: ");
+            for (int i = 0; i < n; i++) {
+                printf("%d", arr[i]);
+                if (i < n - 1) printf(" ");
+            }
+            printf("\n");
+            
+            free(arr);
+            break;
+        }
+        case 2: {  // 浮点数排序
+            float *arr = (float *)malloc(n * sizeof(float));
+            if (!arr) {
+                printf("内存分配失败\n");
+                fclose(fin);
+                return;
+            }
+            
+            for (int i = 0; i < n; i++) {
+                if (fscanf(fin, "%f", &arr[i]) != 1) {
+                    printf("错误: 读取浮点数失败\n");
+                    free(arr);
+                    fclose(fin);
+                    return;
+                }
+            }
+            
+            sort(arr, n, sizeof(float), compareFloat);
+            
+            printf("排序后的浮点数: ");
+            for (int i = 0; i < n; i++) {
+                printf("%.2f", arr[i]);
+                if (i < n - 1) printf(" ");
+            }
+            printf("\n");
+            
+            free(arr);
+            break;
+        }
+        default:
+            printf("错误: 不支持的数据类型 %d\n", choice);
+            break;
     }
 
     fclose(fin);

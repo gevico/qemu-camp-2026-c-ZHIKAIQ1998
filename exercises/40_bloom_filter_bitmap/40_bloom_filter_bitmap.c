@@ -13,39 +13,70 @@ typedef struct {
 } Bloom;
 
 static Bloom *bloom_create(size_t m) {
-    // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+    Bloom *bf = (Bloom *)malloc(sizeof(Bloom));
+    if (!bf) {
+        return NULL;
+    }
+    
+    /* 位图大小m比特,需要 (m+7)/8 字节 */
+    size_t bytes = (m + 7) / 8;
+    bf->bits = (unsigned char *)calloc(bytes, sizeof(unsigned char));
+    if (!bf->bits) {
+        free(bf);
+        return NULL;
+    }
+    
+    bf->m = m;
+    return bf;
 }
 
 static void bloom_free(Bloom *bf) {
-    // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+    if (bf) {
+        free(bf->bits);
+        free(bf);
+    }
 }
 
 /* 位操作 */
 static void set_bit(unsigned char *bm, size_t idx) {
-    // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+    size_t byte_index = idx / 8;
+    size_t offset = idx % 8;
+    bm[byte_index] |= (1 << offset);
 }
+
 static int test_bit(const unsigned char *bm, size_t idx) {
-    // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+    size_t byte_index = idx / 8;
+    size_t offset = idx % 8;
+    return (bm[byte_index] >> offset) & 1;
 }
 
 /* 三个简单哈希：sum(c*k) % m */
 static size_t hash_k(const char *s, size_t m, int k) {
-    // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+    size_t hash = 0;
+    while (*s) {
+        hash += (unsigned char)(*s) * k;
+        s++;
+    }
+    return hash % m;
 }
 
 static void bloom_add(Bloom *bf, const char *s) {
-    // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+    /* 使用3个不同的哈希函数(k=1,2,3) */
+    for (int k = 1; k <= 3; k++) {
+        size_t idx = hash_k(s, bf->m, k);
+        set_bit(bf->bits, idx);
+    }
 }
 
 static int bloom_maybe_contains(Bloom *bf, const char *s) {
-    // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+    /* 检查所有3个哈希位置是否都为1 */
+    for (int k = 1; k <= 3; k++) {
+        size_t idx = hash_k(s, bf->m, k);
+        if (!test_bit(bf->bits, idx)) {
+            return 0;  /* 只要有一个位为0,肯定不存在 */
+        }
+    }
+    return 1;  /* 所有位都为1,可能存在(但有误判可能) */
 }
 
 int main(void) {

@@ -58,8 +58,17 @@ int is_builtin_command(char **args) {
   if (args[0] == NULL)
     return 0;
 
-  // TODO: 在这里添加你的代码
-  // I AM NOT DONE
+  // 检查是否是 cd 命令
+  if (strcmp(args[0], "cd") == 0) {
+    execute_cd(args);
+    return 1;
+  }
+
+  // 检查是否是 exit 命令
+  if (strcmp(args[0], "exit") == 0) {
+    execute_exit();
+    return 1;
+  }
 
   return 0;
 }
@@ -68,7 +77,6 @@ int parse_input(char *input, char **args) {
   int i = 0;
   int in_quotes = 0;
   char *buf = input;
-  char *arg_start = NULL;
   char arg_buf[MAX_INPUT];  // 临时存储当前正在解析的参数
   int arg_buf_idx = 0;
 
@@ -77,13 +85,31 @@ int parse_input(char *input, char **args) {
   while (*buf != '\0' && i < MAX_ARGS - 1) {
       char c = *buf;
 
-        // TODO: 在这里添加你的代码
-        // I AM NOT DONE
+      if (c == '"') {
+          // 处理引号
+          in_quotes = !in_quotes;
+      } else if (c == ' ' || c == '\t') {
+          if (!in_quotes) {
+              // 空格分隔符,结束当前参数
+              if (arg_buf_idx > 0) {
+                  arg_buf[arg_buf_idx] = '\0';
+                  args[i++] = strdup(arg_buf);
+                  arg_buf_idx = 0;
+                  memset(arg_buf, 0, sizeof(arg_buf));
+              }
+          } else {
+              // 在引号内,保留空格
+              arg_buf[arg_buf_idx++] = c;
+          }
+      } else {
+          // 普通字符,添加到当前参数
+          arg_buf[arg_buf_idx++] = c;
+      }
 
       buf++;
   }
 
-  // 处理最后一个参数（循环结束后可能还有未加入的）
+  // 处理最后一个参数(循环结束后可能还有未加入的)
   if (arg_buf_idx > 0) {
       arg_buf[arg_buf_idx] = '\0';
       args[i++] = strdup(arg_buf);

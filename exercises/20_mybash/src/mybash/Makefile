@@ -21,8 +21,20 @@ TARGET_PATH := $(BINDIR)/$(TARGET)
 
 all: $(TARGET_PATH)
 
-# TODO: 在这里添加你的代码
-# I AM NOT DONE
+# 编译目标文件
+$(OBJDIR)/%.o: %.c | $(OBJDIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# 链接生成可执行文件
+$(TARGET_PATH): $(OBJS) | $(BINDIR)
+	$(CC) $(CFLAGS) -o $@ $^ $(LINKLIBS) -lmysed -lmywc -lmytrans -lmyfile
+
+# 创建输出目录
+$(OBJDIR):
+	mkdir -p $(OBJDIR)
+
+$(BINDIR):
+	mkdir -p $(BINDIR)
 
 clean:
 	@rm -rf $(OBJDIR)/*.o $(TARGET_PATH)

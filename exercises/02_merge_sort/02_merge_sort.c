@@ -14,8 +14,46 @@ Student students[MAX_STUDENTS];
 Student temp[MAX_STUDENTS];
 
 void merge_sort(int left, int right) {
-    // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+    // 递归终止条件：区间长度为 1 或 0
+    if (left >= right) {
+        return;
+    }
+
+    // 1. 划分：计算中间点，避免整数溢出
+    int mid = left + (right - left) / 2;
+
+    // 2. 递归：分别对左右两半排序
+    merge_sort(left, mid);
+    merge_sort(mid + 1, right);
+
+    // 3. 归并：将两个有序子序列合并到 temp，再拷贝回 students
+    int i = left;       // 左半部分指针
+    int j = mid + 1;    // 右半部分指针
+    int k = left;       // 临时数组指针
+
+    // 合并两个有序子数组（降序）
+    while (i <= mid && j <= right) {
+        if (students[i].score >= students[j].score) {
+            temp[k++] = students[i++];
+        } else {
+            temp[k++] = students[j++];
+        }
+    }
+
+    // 将左半部分剩余元素复制到 temp
+    while (i <= mid) {
+        temp[k++] = students[i++];
+    }
+
+    // 将右半部分剩余元素复制到 temp
+    while (j <= right) {
+        temp[k++] = students[j++];
+    }
+
+    // 将归并结果从 temp 拷贝回 students 对应区间
+    for (int idx = left; idx <= right; idx++) {
+        students[idx] = temp[idx];
+    }
 }
 
 int main(void) {

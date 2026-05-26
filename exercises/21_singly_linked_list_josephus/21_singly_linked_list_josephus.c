@@ -62,20 +62,48 @@ void josephus_problem(int n, int k, int m) {
     }
 
     // 依次出列并打印顺序
-    for (int out = 0; out < n; ++out) {
-        if (m == 1) {
-            // m==1 时当前节点直接出列
-            // TODO: 在这里添加你的代码
-            // I AM NOT DONE
+    int remaining = n;
+    while (remaining > 0) {
+        if (remaining == 1) {
+            // 只剩一个节点，直接输出并使用delete函数删除
+            print_item(current);
+            delete(current);
+            break;
         }
-
-        // 数到 m 的那个人出列：从 current 开始走 m-1 步，落在第 m 个节点
-        // TODO: 在这里添加你的代码
-        // I AM NOT DONE
-
-        // 此时 current 指向要出列的人
-        // TODO: 在这里添加你的代码
-        // I AM NOT DONE
+        
+        // 找到要删除节点的前一个节点
+        link prev;
+        link to_delete;
+        
+        if (m == 1) {
+            // m==1 时，直接删除当前节点
+            to_delete = current;
+            
+            // 找到前一个节点
+            prev = to_delete;
+            while (prev->next != NULL && prev->next != to_delete) {
+                prev = prev->next;
+            }
+        } else {
+            // m > 1 时，走 m-1 步找到要删除的节点的前一个节点
+            prev = current;
+            for (int step = 1; step < m - 1; ++step) {
+                prev = prev->next ? prev->next : get_head_node();
+            }
+            
+            // 此时 prev->next 是要出列的节点
+            to_delete = prev->next ? prev->next : get_head_node();
+        }
+        
+        // 打印出列的人
+        print_item(to_delete);
+        
+        // 更新 current 为下一个要开始报数的人
+        current = to_delete->next ? to_delete->next : get_head_node();
+        
+        // 使用delete函数删除节点，它会正确处理head指针
+        delete(to_delete);
+        remaining--;
     }
 
     printf("\n");

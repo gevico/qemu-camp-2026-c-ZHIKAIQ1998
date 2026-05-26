@@ -22,15 +22,33 @@ TreeNode* create_node(char letter) {
 
 // 向BST中插入节点或更新计数
 TreeNode* insert_or_update(TreeNode* root, char letter) {
-    // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+    if (root == NULL) {
+        return create_node(letter);
+    }
+    
+    char lower_letter = tolower(letter);
+    
+    if (lower_letter < root->letter) {
+        root->left = insert_or_update(root->left, letter);
+    } else if (lower_letter > root->letter) {
+        root->right = insert_or_update(root->right, letter);
+    } else {
+        // 字母已存在，增加计数
+        root->count++;
+    }
+    
+    return root;
 }
 
 // 中序遍历BST并打印结果（按字母顺序）
 void inorder_traversal(TreeNode* root) {
-    // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+    if (root == NULL) {
+        return;
+    }
+    
+    inorder_traversal(root->left);
     printf("%c:%d\n", root->letter, root->count);
+    inorder_traversal(root->right);
 }
 
 // 释放BST内存
@@ -43,9 +61,22 @@ void free_tree(TreeNode* root) {
 }
 
 int main(int argc, char *argv[]) {
-    const char* file_path = "paper.txt";
+    const char* file_paths[] = {
+        "paper.txt",
+        "exercises/25_counter_letter/paper.txt",
+        "../exercises/25_counter_letter/paper.txt"
+    };
+    int num_paths = sizeof(file_paths) / sizeof(file_paths[0]);
     
-    FILE *file = fopen(file_path, "r");
+    FILE *file = NULL;
+    
+    for (int i = 0; i < num_paths; i++) {
+        file = fopen(file_paths[i], "r");
+        if (file != NULL) {
+            break;
+        }
+    }
+    
     if (file == NULL) {
         perror("Error opening file");
         return 1;

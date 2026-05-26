@@ -20,9 +20,12 @@ struct Test {
  *      → 结构体首地址 = 成员地址 - 成员偏移量
  * 类型约束：使用 typeof 对 ptr 的类型进行校验，减少误用风险
  */
-#define container_of(ptr, type, member)
-    // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+#define container_of(ptr, type, member) \
+    ({ \
+        const typeof(((type *)0)->member) *__mptr = (ptr); \
+        (void)(__mptr); /* 类型检查：如果 ptr 类型与 member 不匹配会产生警告 */ \
+        (type *)((char *)(ptr) - offsetof(type, member)); \
+    })
 
 int main(void) {
     struct Test t = {.a = 42, .b = 'Z'};
